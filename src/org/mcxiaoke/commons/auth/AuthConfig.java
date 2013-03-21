@@ -1,6 +1,6 @@
-package org.mcxiaoke.commons.http.auth;
+package org.mcxiaoke.commons.auth;
 
-import org.mcxiaoke.commons.http.auth.AuthConstants.OAuthParameterStyle;
+import org.mcxiaoke.commons.auth.AuthConstants.OAuthParameterStyle;
 import org.mcxiaoke.commons.util.StringUtils;
 
 /**

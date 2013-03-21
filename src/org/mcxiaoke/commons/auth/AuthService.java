@@ -1,4 +1,4 @@
-package org.mcxiaoke.commons.http.auth;
+package org.mcxiaoke.commons.auth;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -13,9 +13,9 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import org.apache.http.protocol.HTTP;
+import org.mcxiaoke.commons.auth.AuthConstants.OAuthParameterStyle;
 import org.mcxiaoke.commons.http.Parameter;
 import org.mcxiaoke.commons.http.SimpleRequest;
-import org.mcxiaoke.commons.http.auth.AuthConstants.OAuthParameterStyle;
 import org.mcxiaoke.commons.http.util.URIUtilsEx;
 import org.mcxiaoke.commons.util.Base64;
 import org.mcxiaoke.commons.util.StringUtils;

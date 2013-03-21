@@ -12,7 +12,7 @@
  * the License.
  */
 
-package org.mcxiaoke.commons.http.util;
+package org.mcxiaoke.commons.http.ssl;
 
 import java.security.GeneralSecurityException;
 import java.security.KeyStore;

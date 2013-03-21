@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.http.NameValuePair;
-import org.mcxiaoke.commons.http.auth.AuthConfig;
+import org.mcxiaoke.commons.auth.AuthConfig;
 import org.mcxiaoke.commons.util.LogUtils;
 import org.mcxiaoke.commons.util.StringUtils;
 

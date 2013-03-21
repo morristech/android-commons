@@ -14,16 +14,16 @@
  * under the License.
  *
  */
-package org.mcxiaoke.commons.http.auth;
+package org.mcxiaoke.commons.auth;
 
 /**
  * Value class for OAuth consumer keys.
  */
-public class ConsumerKey {
+public class OAuthConsumer {
     private final String key;
     private final String secret;
 
-    public ConsumerKey(String key, String secret) {
+    public OAuthConsumer(String key, String secret) {
         this.key = key;
         this.secret = secret;
     }
@@ -65,7 +65,7 @@ public class ConsumerKey {
     public boolean equals(Object o) {
         if (o == this) return true;
         if (o == null || o.getClass() != getClass()) return false;
-        ConsumerKey other = (ConsumerKey) o;
+        OAuthConsumer other = (OAuthConsumer) o;
         return key.equals(other.key) && secret.equals(other.secret);
     }
 }

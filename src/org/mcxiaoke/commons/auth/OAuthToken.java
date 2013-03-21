@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.mcxiaoke.commons.http.auth;
+package org.mcxiaoke.commons.auth;
 
 /**
  * @author mcxiaoke

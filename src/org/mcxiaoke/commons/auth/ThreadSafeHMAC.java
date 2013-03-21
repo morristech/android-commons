@@ -14,7 +14,7 @@
  * under the License.
  *
  */
-package org.mcxiaoke.commons.http.auth;
+package org.mcxiaoke.commons.auth;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
@@ -36,7 +36,7 @@ public class ThreadSafeHMAC {
 
 	private final Mac mac;
 
-	public ThreadSafeHMAC(ConsumerKey consumerAuth, OAuthToken userAuth) {
+	public ThreadSafeHMAC(OAuthConsumer consumerAuth, OAuthToken userAuth) {
 		try {
 			byte[] keyBytes = (consumerAuth.getSecret() + "&" + userAuth
 					.getSecret()).getBytes(HTTP.UTF_8);
