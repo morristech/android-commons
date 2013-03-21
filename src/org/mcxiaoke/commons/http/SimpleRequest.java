@@ -16,11 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.client.methods.HttpUriRequest;
 import org.mcxiaoke.commons.http.auth.AuthConfig;
-import org.mcxiaoke.commons.http.util.HttpUtils;
 import org.mcxiaoke.commons.util.LogUtils;
 import org.mcxiaoke.commons.util.StringUtils;
 
@@ -91,7 +88,7 @@ public class SimpleRequest {
 	}
 
 	public String getMethodName() {
-		return HttpUtils.getMethodName(mMethod);
+		return getMethodName(mMethod);
 	}
 
 	public AuthConfig getAuthConfig() {
@@ -223,6 +220,14 @@ public class SimpleRequest {
 		mParameters.clear();
 		mQueryParameters.clear();
 		mFileParameters.clear();
+	}
+
+	public static String getMethodName(final HttpMethod method) {
+		if (method != null) {
+			return method.name();
+		} else {
+			return null;
+		}
 	}
 
 	public final static class RequestBuilder {

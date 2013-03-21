@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.mcxiaoke.commons.http.util;
+package org.mcxiaoke.commons.http;
 
 import org.apache.http.HttpVersion;
 import org.apache.http.client.methods.HttpDelete;
@@ -23,7 +23,6 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.HTTP;
-import org.mcxiaoke.commons.http.HttpMethod;
 import org.mcxiaoke.commons.http.impl.GzipRequestInterceptor;
 import org.mcxiaoke.commons.http.impl.GzipResponseInterceptor;
 import org.mcxiaoke.commons.http.impl.RequestRetryHandler;
@@ -36,7 +35,7 @@ import android.net.SSLSessionCache;
  * @author mcxiaoke
  * 
  */
-public final class HttpUtils {
+public final class SimpleClientFactory {
 	private static final int DEFAULT_MAX_ALL_CONNECTIONS = 100;
 	private static final int DEFAULT_MAX_CONNECTIONS = 20;
 	private static final int DEFAULT_SOCKET_TIMEOUT = 30 * 1000;
@@ -51,7 +50,7 @@ public final class HttpUtils {
 
 	public static DefaultHttpClient createSharedHttpClient(Context context,
 			boolean enableGzip, boolean enableRetry) {
-		BasicHttpParams httpParams = createHttpParams();
+		BasicHttpParams httpParams = createDefaultHttpParams();
 		ThreadSafeClientConnManager cm = createThreadSafeClientConnManager(
 				context, httpParams);
 		DefaultHttpClient client = new DefaultHttpClient(cm, httpParams);
@@ -67,17 +66,26 @@ public final class HttpUtils {
 	}
 
 	public static DefaultHttpClient createSingleHttpClient(Context context) {
-		BasicHttpParams httpParams = createHttpParams();
+		return createSharedHttpClient(context, true, true);
+	}
+
+	public static DefaultHttpClient createSingleHttpClient(Context context,
+			boolean enableGzip, boolean enableRetry) {
+		BasicHttpParams httpParams = createDefaultHttpParams();
 		SingleClientConnManager cm = createSingleClientConnManager(httpParams);
 		DefaultHttpClient client = new DefaultHttpClient(cm, httpParams);
-		client.addResponseInterceptor(new GzipResponseInterceptor());
-		client.addRequestInterceptor(new GzipRequestInterceptor());
-		client.setHttpRequestRetryHandler(new RequestRetryHandler(
-				DEFAULT_MAX_RETRIES));
+		if (enableGzip) {
+			client.addResponseInterceptor(new GzipResponseInterceptor());
+			client.addRequestInterceptor(new GzipRequestInterceptor());
+		}
+		if (enableRetry) {
+			client.setHttpRequestRetryHandler(new RequestRetryHandler(
+					DEFAULT_MAX_RETRIES));
+		}
 		return client;
 	}
 
-	public static SingleClientConnManager createSingleClientConnManager(
+	private static SingleClientConnManager createSingleClientConnManager(
 			BasicHttpParams httpParams) {
 
 		SchemeRegistry schemeRegistry = new SchemeRegistry();
@@ -90,7 +98,7 @@ public final class HttpUtils {
 		return cm;
 	}
 
-	public static ThreadSafeClientConnManager createThreadSafeClientConnManager(
+	private static ThreadSafeClientConnManager createThreadSafeClientConnManager(
 			BasicHttpParams httpParams) {
 
 		SchemeRegistry schemeRegistry = new SchemeRegistry();
@@ -103,30 +111,31 @@ public final class HttpUtils {
 		return cm;
 	}
 
-	public static ThreadSafeClientConnManager createThreadSafeClientConnManager(
+	private static ThreadSafeClientConnManager createThreadSafeClientConnManager(
 			Context context, BasicHttpParams httpParams) {
 		// Use a session cache for SSL sockets
-		SSLSessionCache sessionCache = context == null ? null
-				: new SSLSessionCache(context);
+		// SSLSessionCache sessionCache = context == null ? null
+		// : new SSLSessionCache(context);
 
 		SchemeRegistry schemeRegistry = new SchemeRegistry();
 		schemeRegistry.register(new Scheme("http", PlainSocketFactory
 				.getSocketFactory(), 80));
-		// schemeRegistry.register(new Scheme("https", SSLSocketFactory
-		// .getSocketFactory(), 443));
-		schemeRegistry.register(new Scheme("https", SSLCertificateSocketFactory
-				.getHttpSocketFactory(DEFAULT_SOCKET_TIMEOUT, sessionCache),
-				443));
+		schemeRegistry.register(new Scheme("https", SSLSocketFactory
+				.getSocketFactory(), 443));
+		// schemeRegistry.register(new Scheme("https",
+		// SSLCertificateSocketFactory
+		// .getHttpSocketFactory(DEFAULT_SOCKET_TIMEOUT, sessionCache),
+		// 443));
 		ThreadSafeClientConnManager cm = new ThreadSafeClientConnManager(
 				httpParams, schemeRegistry);
 		return cm;
 	}
 
-	public static BasicHttpParams createHttpParams() {
+	private static BasicHttpParams createDefaultHttpParams() {
 		return createHttpParams(DEFAULT_SOCKET_TIMEOUT, DEFAULT_MAX_CONNECTIONS);
 	}
 
-	public static BasicHttpParams createHttpParams(int socketTimeout,
+	private static BasicHttpParams createHttpParams(int socketTimeout,
 			int maxConnections) {
 		BasicHttpParams httpParams = new BasicHttpParams();
 
@@ -150,31 +159,6 @@ public final class HttpUtils {
 
 		HttpClientParams.setRedirecting(httpParams, false);
 		return httpParams;
-	}
-
-	public static String getMethodName(final HttpMethod method) {
-		String methodName = null;
-		switch (method) {
-		case HEAD:
-			methodName = HttpHead.METHOD_NAME;
-			break;
-		case GET:
-			methodName = HttpGet.METHOD_NAME;
-			break;
-		case DELETE:
-			methodName = HttpDelete.METHOD_NAME;
-			break;
-		case POST:
-			methodName = HttpPost.METHOD_NAME;
-			break;
-		case PUT:
-			methodName = HttpPut.METHOD_NAME;
-			break;
-		default:
-			// throw new NullPointerException("http method must not be null.");
-			break;
-		}
-		return methodName;
 	}
 
 }

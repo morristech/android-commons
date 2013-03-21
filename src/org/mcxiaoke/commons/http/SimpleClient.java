@@ -33,7 +33,6 @@ import org.apache.http.params.HttpProtocolParams;
 import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.protocol.HttpContext;
 import org.apache.http.protocol.SyncBasicHttpContext;
-import org.mcxiaoke.commons.http.util.HttpUtils;
 import org.mcxiaoke.commons.util.NetworkUtils;
 
 import android.content.Context;
@@ -65,7 +64,7 @@ public class SimpleClient {
 	}
 
 	private DefaultHttpClient createHttpClient(Context context) {
-		DefaultHttpClient client = HttpUtils.createSharedHttpClient(context);
+		DefaultHttpClient client = SimpleClientFactory.createSharedHttpClient(context);
 		client.addRequestInterceptor(new CurlLogger());
 		client.addRequestInterceptor(new HttpRequestInterceptor() {
 			@Override
