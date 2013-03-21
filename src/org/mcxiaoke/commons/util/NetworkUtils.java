@@ -1,5 +1,9 @@
 package org.mcxiaoke.commons.util;
 
+import java.net.InetSocketAddress;
+import java.net.Proxy;
+import java.net.Proxy.Type;
+
 import org.apache.http.HttpHost;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.params.HttpParams;
@@ -25,6 +29,41 @@ public final class NetworkUtils {
 	private static final String MOBILE_CMWAP = "cmwap";
 	private static final String MOBILE_3GWAP = "3gwap";
 	private static final String MOBILE_UNIWAP = "uniwap";
+
+	/**
+	 * 根据当前网络状态获取代理
+	 * 
+	 * @param context
+	 * @param httpParams
+	 */
+	public static final java.net.Proxy getProxyForChina(final Context context) {
+		if (context == null) {
+			return Proxy.NO_PROXY;
+		}
+		boolean needCheckProxy = true;
+
+		ConnectivityManager cm = (ConnectivityManager) context
+				.getSystemService(Context.CONNECTIVITY_SERVICE);
+		final NetworkInfo networkInfo = cm.getActiveNetworkInfo();
+		if (networkInfo == null
+				|| WIFI.equalsIgnoreCase(networkInfo.getTypeName())
+				|| networkInfo.getExtraInfo() == null) {
+			needCheckProxy = false;
+		}
+		if (needCheckProxy) {
+			String typeName = networkInfo.getExtraInfo();
+			if (MOBILE_CTWAP.equalsIgnoreCase(typeName)) {
+				InetSocketAddress address=new InetSocketAddress("10.0.0.200", 80);
+				return new Proxy(Type.HTTP, address);
+			} else if (MOBILE_CMWAP.equalsIgnoreCase(typeName)
+					|| MOBILE_UNIWAP.equalsIgnoreCase(typeName)
+					|| MOBILE_3GWAP.equalsIgnoreCase(typeName)) {
+				InetSocketAddress address=new InetSocketAddress("10.0.0.172", 80);
+				return new Proxy(Type.HTTP, address);
+			}
+		}
+		return Proxy.NO_PROXY;
+	}
 
 	/**
 	 * 根据当前网络状态填充代理
