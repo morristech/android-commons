@@ -10,14 +10,6 @@ public class AuthConstants {
 	private AuthConstants() {
 	}
 
-	public enum OAuthVersion {
-		BASIC, OAUTH1, OAUTH2;
-	}
-
-	public enum OAuthParameterStyle {
-		AUTHORIZATION_HEADER, QUERY_STRING;
-	}
-
 	public enum ResponseType {
 		CODE("code"), TOKEN("token"), CODE_AND_TOKEN("code_and_token");
 
