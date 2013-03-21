@@ -1,0 +1,1 @@
+android commons libs, include httprequest, cache, json/xml parse, encoding, crypto, string, and some utils.
