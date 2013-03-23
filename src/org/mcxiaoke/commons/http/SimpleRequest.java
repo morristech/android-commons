@@ -44,7 +44,7 @@ public class SimpleRequest {
 	public SimpleRequest(final RequestBuilder builder) {
 		this.mOriginalUrl = builder.getUrl();
 		this.mMethod = builder.getMethod();
-		this.authorization = builder.getAuthConfig();
+		this.authorization = builder.getAuthorization();
 		this.mHeaders = new HashMap<String, String>();
 		this.mParameters = new ArrayList<Parameter>();
 		this.mQueryParameters = new ArrayList<Parameter>();

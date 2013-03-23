@@ -28,18 +28,21 @@ import org.mcxiaoke.commons.util.StringUtils;
 public final class RequestBuilder {
 	private String url;
 	private HttpMethod method;
-	private Authorization oauthConfig;
+	private Authorization authorization;
+	private boolean enableGZipContent;
 	private HashMap<String, String> headers;
 	private ArrayList<Parameter> parameters;
 	private ArrayList<Parameter> queryParameters;
 	private HashMap<String, FileHolder> fileParameters;
-	private boolean enableGZipContent;
 
 	public static RequestBuilder create() {
 		return new RequestBuilder();
 	}
 
 	public RequestBuilder() {
+		this.url = null;
+		this.method = HttpMethod.GET;
+		this.enableGZipContent = true;
 		this.headers = new HashMap<String, String>();
 		this.queryParameters = new ArrayList<Parameter>();
 		this.parameters = new ArrayList<Parameter>();
@@ -58,8 +61,8 @@ public final class RequestBuilder {
 		return method;
 	}
 
-	public Authorization getAuthConfig() {
-		return oauthConfig;
+	public Authorization getAuthorization() {
+		return authorization;
 	}
 
 	public Map<String, String> getHeaders() {
@@ -88,45 +91,62 @@ public final class RequestBuilder {
 	}
 
 	public RequestBuilder setUrl(URL url) {
-		this.url = url.toString();
+		if (url != null) {
+			this.url = url.toString();
+		}
 		return this;
 	}
 
 	public RequestBuilder setUrl(URI uri) {
-		this.url = uri.toString();
+		if (uri != null) {
+			this.url = uri.toString();
+		}
 		return this;
 	}
 
 	public RequestBuilder setMethod(HttpMethod method) {
-		this.method = method;
+		if (method != null) {
+			this.method = method;
+		}
 		return this;
 	}
 
-	public RequestBuilder setAuth(final Authorization oauthConfig) {
-		this.oauthConfig = oauthConfig;
+	public RequestBuilder setAuthorization(final Authorization authorization) {
+		this.authorization = authorization;
 		return this;
 	}
 
 	public RequestBuilder setBasicAuth(final String userName,
 			final String password) {
-		this.oauthConfig = new Authorization(userName, password);
+		if (StringUtils.isNotEmpty(userName)
+				&& StringUtils.isNotEmpty(password)) {
+			this.authorization = new Authorization(userName, password);
+		}
 		return this;
 	}
 
 	public RequestBuilder setOAuth(final String apiKey, final String apiSecret,
 			final String accessToken, final String accessTokenSecret) {
-		this.oauthConfig = new Authorization(apiKey, apiSecret, accessToken,
-				accessTokenSecret);
+		if (StringUtils.isNotEmpty(apiKey) && StringUtils.isNotEmpty(apiSecret)
+				&& StringUtils.isNotEmpty(accessToken)
+				&& StringUtils.isNotEmpty(accessTokenSecret)) {
+			this.authorization = new Authorization(apiKey, apiSecret,
+					accessToken, accessTokenSecret);
+		}
 		return this;
 	}
 
 	public RequestBuilder setOAuth2(final String accessToken) {
-		this.oauthConfig = new Authorization(accessToken);
+		if (StringUtils.isNotEmpty(accessToken)) {
+			this.authorization = new Authorization(accessToken);
+		}
 		return this;
 	}
 
-	public RequestBuilder addHeader(String name, String value) {
-		this.headers.put(name, value);
+	public RequestBuilder addHeader(String key, String value) {
+		if (StringUtils.isNotEmpty(key) && StringUtils.isNotEmpty(value)) {
+			this.headers.put(key, value);
+		}
 		return this;
 	}
 
