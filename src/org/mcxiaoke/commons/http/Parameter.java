@@ -10,7 +10,7 @@ import org.mcxiaoke.commons.http.util.URIUtilsEx;
  * @author mcxiaoke
  * 
  */
-public final class Parameter implements NameValuePair,
+public class Parameter implements NameValuePair,
 		Comparable<Parameter> {
 	private final String name;
 	private final String value;

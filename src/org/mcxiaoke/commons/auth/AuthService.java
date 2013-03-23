@@ -31,76 +31,77 @@ public final class AuthService {
 	private static final String NAME_VALUE_SEPARATOR = "=";
 	private static final String EMPTY_STRING = "";
 	private static final String OAUTH_SCHEME = "OAuth";
-	private static final String OAUTH2_SCHEME = "Bear";
 	private static final String BASIC_SCHEME = "Basic";
 
-	private final AuthConfig mOAuthConfig;
+	private final Authorization mOAuthConfig;
 
-	private AuthService(AuthConfig config) {
+	private AuthService(Authorization config) {
 		this.mOAuthConfig = config;
 	}
 
-	public AuthConfig getOAuthConfig() {
+	public Authorization getOAuthConfig() {
 		return mOAuthConfig;
 	}
 
 	public static void authorize(final SimpleRequest request) {
-		final AuthConfig authorization = request.getAuthConfig();
+		final Authorization authorization = request.getAuthorization();
 		if (request == null || authorization == null
 				|| !authorization.isAuthorized()) {
 			return;
 		}
 		int type = authorization.getAuthType();
-		if (type == AuthConfig.BASIC) {
+		if (type == Authorization.BASIC) {
 			addBasicAuthToHeaders(request);
-		} else if (type == AuthConfig.OAUTH1) {
-			final OAuthParameterStyle style = authorization.getParameterStyle();
-			if (style == OAuthParameterStyle.QUERY_STRING) {
+		} else if (type == Authorization.OAUTH1) {
+			final SignatureStyle style = authorization.getSignatureStyle();
+			if (style == SignatureStyle.QUERY_STRING) {
 				addOAuthToQueryParamters(request);
 			} else {
 				addOAuthToHeaders(request);
 			}
-		} else if (type == AuthConfig.OAUTH2) {
-			final OAuthParameterStyle style = authorization.getParameterStyle();
-			if (style == OAuthParameterStyle.QUERY_STRING) {
+		} else if (type == Authorization.OAUTH2) {
+			final SignatureStyle style = authorization.getSignatureStyle();
+			if (style == SignatureStyle.QUERY_STRING) {
 				addOAuth2ToQueryParamters(request);
 			} else {
-				addOAuth2ToHeaders(request);
+				addOAuth2ToHeaders(style, request);
 			}
 		}
 	}
 
 	private static void addOAuthToQueryParamters(final SimpleRequest request) {
 		final List<Parameter> oauthParameters = generateOAuthParameters(request
-				.getAuthConfig());
+				.getAuthorization());
 		oauthParameters.add(new Parameter(AuthConstants.OAUTH_SIGNATURE,
 				getSignature(request, oauthParameters)));
 		appendAuthorizationToQueryParameters(request, oauthParameters);
 	}
 
 	private static void addOAuth2ToQueryParamters(final SimpleRequest request) {
-		String accessToken = request.getAuthConfig().getToken();
+		String accessToken = request.getAuthorization().getToken();
 		request.addQueryParameter(AuthConstants.OAUTH2_ACCESS_TOKEN,
 				accessToken);
 	}
 
 	private static void addOAuthToHeaders(final SimpleRequest request) {
 		final List<Parameter> oauthParameters = generateOAuthParameters(request
-				.getAuthConfig());
+				.getAuthorization());
 		oauthParameters.add(new Parameter(AuthConstants.OAUTH_SIGNATURE,
 				getSignature(request, oauthParameters)));
 		appendAuthorizationToHeaders(request, oauthParameters);
 	}
 
-	private static void addOAuth2ToHeaders(final SimpleRequest request) {
-		String accessToken = request.getAuthConfig().getToken();
+	private static void addOAuth2ToHeaders(final SignatureStyle style,
+			final SimpleRequest request) {
+		final String headerPrefix = style.getTypeValue();
+		String accessToken = request.getAuthorization().getToken();
 		StringBuilder sb = new StringBuilder();
-		sb.append(OAUTH2_SCHEME).append(" ").append(accessToken);
+		sb.append(headerPrefix).append(" ").append(accessToken);
 		request.addHeader(AuthConstants.HEADER, sb.toString());
 	}
 
 	private static void addBasicAuthToHeaders(final SimpleRequest request) {
-		final AuthConfig authorization = request.getAuthConfig();
+		final Authorization authorization = request.getAuthorization();
 		if (request == null || authorization == null
 				|| !authorization.isAuthorized()) {
 			return;
@@ -144,7 +145,7 @@ public final class AuthService {
 
 	private static String getSignature(final SimpleRequest request,
 			final List<Parameter> oauthParameters) {
-		final AuthConfig authorization = request.getAuthConfig();
+		final Authorization authorization = request.getAuthorization();
 		String baseString = getBaseString(request, oauthParameters);
 		SecretKeySpec secretKey = getSecretKeySpec(
 				authorization.getApiSecret(), authorization.getSecret());
@@ -212,12 +213,10 @@ public final class AuthService {
 	}
 
 	private static List<Parameter> generateOAuthParameters(
-			final AuthConfig authorization) {
-		final AuthConfig auth = authorization;
+			final Authorization authorization) {
+		final Authorization auth = authorization;
 		final List<Parameter> oauthParamters = new ArrayList<Parameter>();
 		if (auth != null) {
-			long timestamp = System.currentTimeMillis() / 1000;
-			long nonce = timestamp + RAND.nextInt();
 			if (StringUtils.isNotEmpty(auth.getToken())) {
 				oauthParamters.add(new Parameter(AuthConstants.OAUTH_TOKEN,
 						auth.getToken()));

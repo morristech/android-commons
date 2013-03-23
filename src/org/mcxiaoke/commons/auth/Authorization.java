@@ -8,38 +8,38 @@ import org.mcxiaoke.commons.util.StringUtils;
  * @author mcxiaoke
  * 
  */
-public class AuthConfig implements java.io.Serializable {
+public class Authorization implements java.io.Serializable {
 	private static final long serialVersionUID = -413250347293002921L;
 
 	public static final int BASIC = 0;
 	public static final int OAUTH1 = 1;
 	public static final int OAUTH2 = 2;
 
-	private int authType;
+	private int type;
 	private String apiKey;
 	private String apiSecret;
-	private OAuthParameterStyle parameterStyle = OAuthParameterStyle.AUTHORIZATION_HEADER;
+	private SignatureStyle signatureStyle = SignatureStyle.QUERY_STRING;
 	private String token;
 	private String secret;;
 
-	public AuthConfig(int type) {
-		this.authType = type;
+	public Authorization(int type) {
+		this.type = type;
 	}
 
-	public AuthConfig(String token) {
-		this.authType = OAUTH2;
+	public Authorization(String token) {
+		this.type = OAUTH2;
 		this.token = token;
 	}
 
-	public AuthConfig(String userName, String password) {
-		this.authType = BASIC;
+	public Authorization(String userName, String password) {
+		this.type = BASIC;
 		this.apiKey = userName;
 		this.apiSecret = password;
 	}
 
-	public AuthConfig(String apiKey, String apiSecret, String token,
+	public Authorization(String apiKey, String apiSecret, String token,
 			String secret) {
-		this.authType = OAUTH1;
+		this.type = OAUTH1;
 		this.apiKey = apiKey;
 		this.apiSecret = apiSecret;
 		this.token = token;
@@ -55,11 +55,11 @@ public class AuthConfig implements java.io.Serializable {
 	}
 
 	public int getAuthType() {
-		return authType;
+		return type;
 	}
 
-	public OAuthParameterStyle getParameterStyle() {
-		return parameterStyle;
+	public SignatureStyle getSignatureStyle() {
+		return signatureStyle;
 	}
 
 	public String getSecret() {
@@ -78,8 +78,8 @@ public class AuthConfig implements java.io.Serializable {
 		this.apiSecret = apiSecret;
 	}
 
-	public void setParameterStyle(OAuthParameterStyle style) {
-		this.parameterStyle = style;
+	public void setSignatureStyle(SignatureStyle style) {
+		this.signatureStyle = style;
 	}
 
 	public void setSecret(String secret) {
@@ -92,7 +92,7 @@ public class AuthConfig implements java.io.Serializable {
 
 	public boolean isAuthorized() {
 		boolean authorized = false;
-		switch (authType) {
+		switch (type) {
 		case BASIC:
 			authorized = (StringUtils.isNotEmpty(getToken()) && StringUtils
 					.isNotEmpty(getSecret()));
@@ -119,9 +119,9 @@ public class AuthConfig implements java.io.Serializable {
 		result = prime * result + ((apiKey == null) ? 0 : apiKey.hashCode());
 		result = prime * result
 				+ ((apiSecret == null) ? 0 : apiSecret.hashCode());
-		result = prime * result + authType;
+		result = prime * result + type;
 		result = prime * result
-				+ ((parameterStyle == null) ? 0 : parameterStyle.hashCode());
+				+ ((signatureStyle == null) ? 0 : signatureStyle.hashCode());
 		result = prime * result + ((secret == null) ? 0 : secret.hashCode());
 		result = prime * result + ((token == null) ? 0 : token.hashCode());
 		return result;
@@ -135,7 +135,7 @@ public class AuthConfig implements java.io.Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		AuthConfig other = (AuthConfig) obj;
+		Authorization other = (Authorization) obj;
 		if (apiKey == null) {
 			if (other.apiKey != null)
 				return false;
@@ -146,9 +146,9 @@ public class AuthConfig implements java.io.Serializable {
 				return false;
 		} else if (!apiSecret.equals(other.apiSecret))
 			return false;
-		if (authType != other.authType)
+		if (type != other.type)
 			return false;
-		if (parameterStyle != other.parameterStyle)
+		if (signatureStyle != other.signatureStyle)
 			return false;
 		if (secret == null) {
 			if (other.secret != null)
@@ -167,13 +167,13 @@ public class AuthConfig implements java.io.Serializable {
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("AuthConfig [authType=");
-		builder.append(authType);
+		builder.append(type);
 		builder.append(", apiKey=");
 		builder.append(apiKey);
 		builder.append(", apiSecret=");
 		builder.append(apiSecret);
 		builder.append(", parameterStyle=");
-		builder.append(parameterStyle);
+		builder.append(signatureStyle);
 		builder.append(", token=");
 		builder.append(token);
 		builder.append(", secret=");

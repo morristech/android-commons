@@ -7,7 +7,7 @@ package org.mcxiaoke.commons.http;
  * @author mcxiaoke
  * 
  */
-public final class SimpleException extends Exception {
+public class SimpleException extends Exception {
 
 	private static final int IO_EXCEPTION = StatusCodes.STATUS_CODE_IO_ERROR;
 
