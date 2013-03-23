@@ -167,27 +167,27 @@ public final class RequestBuilder {
 		return this;
 	}
 
-	public RequestBuilder addQuery(String key, String value) {
+	public RequestBuilder addQueryParameter(String key, String value) {
 		if (StringUtils.isNotEmpty(key)) {
 			parameters.add(new Parameter(key, value));
 		}
 		return this;
 	}
 
-	public RequestBuilder addQuery(NameValuePair pair) {
+	public RequestBuilder addQueryParameter(NameValuePair pair) {
 		if (pair != null) {
 			parameters.add(new Parameter(pair));
 		}
 		return this;
 	}
 
-	public void addQuerys(Collection<? extends Parameter> params) {
+	public void addQueryParameters(Collection<? extends Parameter> params) {
 		if (params != null) {
 			parameters.addAll(params);
 		}
 	}
 
-	public RequestBuilder addQuery(Map<String, String> params) {
+	public RequestBuilder addQueryParameters(Map<String, String> params) {
 		if (params != null) {
 			for (Map.Entry<String, String> entry : params.entrySet()) {
 				Parameter p = new Parameter(entry.getKey(), entry.getValue());
