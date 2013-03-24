@@ -34,9 +34,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.TextUtils;
 
-import com.loopj.android.http.AsyncHttpClient;
-import com.loopj.android.http.SerializableCookie;
-
 /**
  * A persistent cookie store which implements the Apache HttpClient
  * {@link CookieStore} interface. Cookies are stored and will persist on the

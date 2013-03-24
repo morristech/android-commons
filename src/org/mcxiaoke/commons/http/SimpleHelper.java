@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.codec.Charsets;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -37,7 +36,7 @@ final class SimpleHelper {
 	private static final String ENCODING_UTF8 = HTTP.UTF_8;
 	private static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";
 	private static final String ENCODING_GZIP = "gzip";
-	private static final Charset CHARSET_UTF8 = Charsets.UTF_8;
+	private static final Charset CHARSET_UTF8 = Charset.forName(ENCODING_UTF8);
 
 	public static HttpEntity createHttpEntity(final SimpleRequest request) {
 		return request.hasFileParameters() ? encodeMultiPartEntity(request)
