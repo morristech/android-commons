@@ -9,7 +9,7 @@ package org.mcxiaoke.commons.http;
  */
 public class SimpleException extends Exception {
 
-	private static final int IO_EXCEPTION = StatusCodes.STATUS_CODE_IO_ERROR;
+	private static final int IO_ERROR = -1;
 
 	private static final long serialVersionUID = 1L;
 
@@ -18,7 +18,7 @@ public class SimpleException extends Exception {
 
 	public SimpleException() {
 		super();
-		initialize(IO_EXCEPTION, getMessage());
+		initialize(IO_ERROR, getMessage());
 	}
 
 	public SimpleException(int errorCode) {
@@ -28,7 +28,7 @@ public class SimpleException extends Exception {
 
 	public SimpleException(String errorMessage) {
 		super();
-		initialize(IO_EXCEPTION, errorMessage);
+		initialize(IO_ERROR, errorMessage);
 	}
 
 	public SimpleException(int errorCode, String errorMessage,

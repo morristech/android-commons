@@ -8,7 +8,6 @@ import java.io.InputStream;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
 import org.apache.http.entity.BufferedHttpEntity;
@@ -55,8 +54,8 @@ public class SimpleResponse {
 		this.statusCode = this.statusLine.getStatusCode();
 		this.statusMessage = this.statusLine.getReasonPhrase();
 		this.headers = response.getAllHeaders();
-		this.entity=wrapEntity(response);
-//		this.entity = new BufferedHttpEntity(response.getEntity());
+		this.entity = wrapEntity(response);
+		// this.entity = new BufferedHttpEntity(response.getEntity());
 	}
 
 	public Exception getException() {
@@ -71,8 +70,20 @@ public class SimpleResponse {
 		return this.statusCode;
 	}
 
-	public boolean isSuccessStatusCode() {
+	public boolean isSuccess() {
 		return StatusCodes.isSuccess(statusCode);
+	}
+
+	public boolean isRedirect() {
+		return StatusCodes.isRedirect(statusCode);
+	}
+
+	public boolean isRequestError() {
+		return StatusCodes.isRequestError(statusCode);
+	}
+
+	public boolean isServerError() {
+		return StatusCodes.isServerError(statusCode);
 	}
 
 	public String getStatusMessage() {

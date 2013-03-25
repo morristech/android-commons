@@ -218,27 +218,35 @@ public final class RequestBuilder {
 	}
 
 	public RequestBuilder addParameter(String key, File file) {
-		try {
-			addParameter(key, new FileInputStream(file), file.getName());
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+		if (StringUtils.isNotEmpty(key) && file != null) {
+			try {
+				addParameter(key, new FileInputStream(file), file.getName());
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+			}
 		}
 		return this;
 	}
 
 	public RequestBuilder addParameter(String key, byte[] bytes) {
-		addParameter(key, new ByteArrayInputStream(bytes));
+		if (StringUtils.isNotEmpty(key) && bytes != null) {
+			addParameter(key, new ByteArrayInputStream(bytes));
+		}
 		return this;
 	}
 
-	public RequestBuilder addParameter(String name, InputStream stream) {
-		addParameter(name, stream, null);
+	public RequestBuilder addParameter(String key, InputStream stream) {
+		if (StringUtils.isNotEmpty(key) && stream != null) {
+			addParameter(key, stream, null);
+		}
 		return this;
 	}
 
 	public RequestBuilder addParameter(String key, InputStream stream,
 			String fileName) {
-		addParameter(key, stream, fileName, null);
+		if (StringUtils.isNotEmpty(key) && stream != null) {
+			addParameter(key, stream, fileName, null);
+		}
 		return this;
 	}
 

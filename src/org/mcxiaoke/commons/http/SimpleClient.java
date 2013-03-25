@@ -55,7 +55,7 @@ public class SimpleClient {
 	private volatile LoggingConfiguration curlConfiguration;
 
 	public SimpleClient(Context context) {
-		mAppContext = context.getApplicationContext();
+		mAppContext = context;
 		mHeaders = new HashMap<String, String>();
 		mHttpContext = new SyncBasicHttpContext(new BasicHttpContext());
 		mHttpClient = createHttpClient(mAppContext);

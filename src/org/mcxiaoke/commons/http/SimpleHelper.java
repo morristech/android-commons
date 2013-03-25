@@ -24,6 +24,7 @@ import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.InputStreamBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.protocol.HTTP;
+import org.mcxiaoke.commons.auth.AuthService;
 import org.mcxiaoke.commons.http.SimpleRequest.FileHolder;
 import org.mcxiaoke.commons.http.util.URIUtilsEx;
 import org.mcxiaoke.commons.util.StringUtils;
@@ -88,6 +89,8 @@ final class SimpleHelper {
 	}
 
 	public static HttpUriRequest createHttpRequest(final SimpleRequest request) {
+		AuthService.authorize(request);
+		
 		HttpUriRequest httpRequest = null;
 		String baseUrl = request.getUrl();
 		HttpMethod method = request.getMethod();

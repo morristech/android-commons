@@ -146,7 +146,7 @@ public final class SimpleClientFactory {
 				DEFAULT_MAX_ALL_CONNECTIONS);
 
 		HttpProtocolParams.setUseExpectContinue(httpParams, false);
-		HttpProtocolParams.setContentCharset(null, HTTP.UTF_8);
+		HttpProtocolParams.setContentCharset(httpParams, HTTP.UTF_8);
 		HttpProtocolParams.setVersion(httpParams, HttpVersion.HTTP_1_1);
 		// Turn off stale checking. Our connections break all the time anyway,
 		// and it's not worth it to pay the penalty of checking every time.
