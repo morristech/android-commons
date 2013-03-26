@@ -227,6 +227,29 @@ public class SimpleRequest {
 		}
 	}
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("SimpleRequest [mOriginalUrl=");
+		builder.append(mOriginalUrl);
+		builder.append(", mUrl=");
+		builder.append(mUrl);
+		builder.append(", mMethod=");
+		builder.append(mMethod);
+		builder.append(", authorization=");
+		builder.append(authorization);
+		builder.append(", mHeaders=");
+		builder.append(mHeaders);
+		builder.append(", mParameters=");
+		builder.append(mParameters);
+		builder.append(", mQueryParameters=");
+		builder.append(mQueryParameters);
+		builder.append(", mFileParameters=");
+		builder.append(mFileParameters);
+		builder.append("]");
+		return builder.toString();
+	}
+
 	static class FileHolder {
 		private static final String DEFAULT_FILENAME = "filename";
 		public final InputStream inputStream;
@@ -238,6 +261,19 @@ public class SimpleRequest {
 			this.inputStream = inputStream;
 			this.fileName = (fileName == null) ? DEFAULT_FILENAME : fileName;
 			this.contentType = contentType;
+		}
+
+		@Override
+		public String toString() {
+			StringBuilder builder = new StringBuilder();
+			builder.append("FileHolder [inputStream=");
+			builder.append(inputStream);
+			builder.append(", fileName=");
+			builder.append(fileName);
+			builder.append(", contentType=");
+			builder.append(contentType);
+			builder.append("]");
+			return builder.toString();
 		}
 	}
 
