@@ -34,7 +34,7 @@ import android.util.Log;
  * 
  * Currently this file is aligned to zh.txt in ICU 4.6
  */
-public class HanziToPinyin {
+public class PinyinUtils {
 	private static final String TAG = "HanziToPinyin";
 
 	// Turn on this flag when we want to check internal data structure.
@@ -333,7 +333,7 @@ public class HanziToPinyin {
 	private static final char FIRST_UNIHAN = '\u3400';
 	private static final Collator COLLATOR = Collator.getInstance(Locale.CHINA);
 
-	private static HanziToPinyin sInstance;
+	private static PinyinUtils sInstance;
 	private final boolean mHasChinaCollator;
 
 	public static class Token {
@@ -370,12 +370,12 @@ public class HanziToPinyin {
 		public String target;
 	}
 
-	protected HanziToPinyin(boolean hasChinaCollator) {
+	protected PinyinUtils(boolean hasChinaCollator) {
 		mHasChinaCollator = hasChinaCollator;
 	}
 
-	public static HanziToPinyin getInstance() {
-		synchronized (HanziToPinyin.class) {
+	public static PinyinUtils getInstance() {
+		synchronized (PinyinUtils.class) {
 			if (sInstance != null) {
 				return sInstance;
 			}
@@ -388,13 +388,13 @@ public class HanziToPinyin {
 						Log.d(TAG, "Self validation. Result: "
 								+ doSelfValidation());
 					}
-					sInstance = new HanziToPinyin(true);
+					sInstance = new PinyinUtils(true);
 					return sInstance;
 				}
 			}
 			Log.w(TAG,
 					"There is no Chinese collator, HanziToPinyin is disabled");
-			sInstance = new HanziToPinyin(false);
+			sInstance = new PinyinUtils(false);
 			return sInstance;
 		}
 	}
