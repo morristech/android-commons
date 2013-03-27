@@ -32,6 +32,7 @@ import android.text.TextUtils;
  * java.net.URLConnection and android.webkit.MimeTypeMap.
  */
 public final class MimeUtils {
+	private static final String MIME_BINARY_DATA = "application/octet-stream";
 	private static final Map<String, String> mimeTypeToExtensionMap = new HashMap<String, String>();
 
 	private static final Map<String, String> extensionToMimeTypeMap = new HashMap<String, String>();
@@ -497,6 +498,12 @@ public final class MimeUtils {
 			return null;
 		}
 		return mimeTypeToExtensionMap.get(mimeType);
+	}
+
+	public static String getMimeTypeFromPath(String path) {
+		String extension = StringUtils.getFilenameExtension(path);
+		String mimeType = getMimeTypeFromExtension(extension);
+		return mimeType == null ? MIME_BINARY_DATA : mimeType;
 	}
 
 	public static String getFileExtensionFromUrl(String url) {

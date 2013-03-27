@@ -21,33 +21,50 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpPut;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.InputStreamBody;
+import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.protocol.HTTP;
+import org.mcxiaoke.commons.Config;
 import org.mcxiaoke.commons.auth.AuthService;
-import org.mcxiaoke.commons.http.SimpleRequest.FileHolder;
 import org.mcxiaoke.commons.http.util.URIUtilsEx;
+import org.mcxiaoke.commons.util.MimeUtils;
 import org.mcxiaoke.commons.util.StringUtils;
+
+import android.util.Log;
 
 /**
  * @author mcxiaoke
  * 
  */
 final class SimpleHelper {
+	private static final boolean DEBUG = Config.DEBUG;
+	private static final String TAG = "SimpleClient";
 	private static final String ENCODING_UTF8 = HTTP.UTF_8;
 	private static final String HEADER_ACCEPT_ENCODING = "Accept-Encoding";
 	private static final String ENCODING_GZIP = "gzip";
 	private static final Charset CHARSET_UTF8 = Charset.forName(ENCODING_UTF8);
 
+	private static StringBody createStringBody(String text) {
+		try {
+			return new StringBody(text, CHARSET_UTF8);
+		} catch (UnsupportedEncodingException e) {
+			throw new IllegalArgumentException(" UTF8 is not supported?");
+		}
+	}
+
 	public static HttpEntity createHttpEntity(final SimpleRequest request) {
-		return request.hasFileParameters() ? encodeMultiPartEntity(request)
-				: encodeFormEntity(request);
+		boolean hasFile = request.hasFileParameters();
+		if (hasFile) {
+			return encodeMultiPartEntity(request);
+		} else {
+			return encodeFormEntity(request);
+		}
 	}
 
 	public static HttpEntity encodeFormEntity(final SimpleRequest request) {
 		HttpEntity entity = null;
 		try {
-			entity = new UrlEncodedFormEntity(request.getParameters(),
+			entity = new UrlEncodedFormEntity(request.getAllParameters(),
 					ENCODING_UTF8);
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
@@ -56,52 +73,36 @@ final class SimpleHelper {
 	}
 
 	public static HttpEntity encodeMultiPartEntity(final SimpleRequest request) {
-		MultipartEntity entity = new MultipartEntity();
-		encodeTextParams(entity, request.getParameters());
-		encodeBinaryParams(entity, request.getFileParameters());
-		return entity;
-	}
-
-	public static void encodeTextParams(final MultipartEntity multipartEntity,
-			final List<Parameter> parameters) {
-		for (Parameter param : parameters) {
-			multipartEntity.addPart(param.getName(),
-					StringBody.create(param.getValue(), CHARSET_UTF8));
+		if (DEBUG) {
+			Log.d(TAG, "encodeMultiPartEntity() request=" + request);
 		}
-	}
-
-	public static void encodeBinaryParams(MultipartEntity multipartEntity,
-			final Map<String, FileHolder> fileParameters) {
-		for (Map.Entry<String, FileHolder> entry : fileParameters.entrySet()) {
-			FileHolder holder = entry.getValue();
-			if (holder.inputStream != null) {
-				if (holder.contentType != null) {
-					multipartEntity.addPart(entry.getKey(),
-							new InputStreamBody(holder.inputStream,
-									holder.contentType, holder.fileName));
-				} else {
-					multipartEntity.addPart(entry.getKey(),
-							new InputStreamBody(holder.inputStream,
-									holder.fileName));
-				}
+		MultipartEntity entity = new MultipartEntity();
+		List<Parameter> parameters = request.getAllParameters();
+		for (Parameter param : parameters) {
+			if (param.hasFile()) {
+				final String filename = param.getValue();
+				final String mimeType = MimeUtils.getMimeTypeFromPath(filename);
+				entity.addPart(param.getName(), new FileBody(param.getFile(),
+						mimeType));
+			} else {
+				entity.addPart(param.getName(),
+						createStringBody(param.getValue()));
 			}
 		}
+
+		return entity;
 	}
 
 	public static HttpUriRequest createHttpRequest(final SimpleRequest request) {
 		AuthService.authorize(request);
-		
+
 		HttpUriRequest httpRequest = null;
-		String baseUrl = request.getUrl();
+		String requestUrl = request.getUrl();
 		HttpMethod method = request.getMethod();
 		Map<String, String> headers = new HashMap<String, String>(
 				request.getHeaders());
-		ArrayList<Parameter> queryParameters = new ArrayList<Parameter>(
-				request.getQueryParameters());
 		ArrayList<Parameter> parameters = new ArrayList<Parameter>(
-				request.getParameters());
-		String requestUrl = URIUtilsEx.appendQueryParameters(baseUrl,
-				queryParameters);
+				request.getAllParameters());
 		if (HttpMethod.GET == method || HttpMethod.DELETE == method) {
 
 			requestUrl = URIUtilsEx.appendQueryParameters(requestUrl,
@@ -121,10 +122,7 @@ final class SimpleHelper {
 			httpRequest = httpEntityEnclosingRequest;
 		}
 
-		if (request.isEnableGZipContent()) {
-			request.addHeader(HEADER_ACCEPT_ENCODING, ENCODING_GZIP);
-		}
-
+		request.addHeader(HEADER_ACCEPT_ENCODING, ENCODING_GZIP);
 		if (headers != null && headers.size() > 0) {
 			for (Map.Entry<String, String> entry : headers.entrySet()) {
 				httpRequest.addHeader(entry.getKey(), entry.getValue());
@@ -152,7 +150,7 @@ final class SimpleHelper {
 					.getQueryParameters(uri);
 			if (queryParameters != null) {
 				for (NameValuePair pair : queryParameters) {
-					parameters.add(new Parameter(pair));
+					parameters.add(Parameter.of(pair));
 				}
 			}
 			requestUrl = requestUrl.substring(0, requestUrl.indexOf("?"));

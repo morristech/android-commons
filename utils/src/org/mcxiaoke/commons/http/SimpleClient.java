@@ -61,6 +61,7 @@ public class SimpleClient {
 		mHttpClient = createHttpClient(mAppContext);
 		mCookieStore = new BasicCookieStore();
 		mHttpContext.setAttribute(ClientContext.COOKIE_STORE, mCookieStore);
+		enableCurlLogging(TAG, Log.VERBOSE);
 	}
 
 	private DefaultHttpClient createHttpClient(Context context) {

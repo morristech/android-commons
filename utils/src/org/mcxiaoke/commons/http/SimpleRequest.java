@@ -3,11 +3,7 @@
  */
 package org.mcxiaoke.commons.http;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -15,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.mcxiaoke.commons.auth.Authorization;
+import org.mcxiaoke.commons.util.CollectionUtils;
 import org.mcxiaoke.commons.util.LogUtils;
 import org.mcxiaoke.commons.util.StringUtils;
 
@@ -34,46 +31,17 @@ public class SimpleRequest {
 	private final String mOriginalUrl;
 	private final String mUrl;
 	private final HttpMethod mMethod;
-	private final Authorization authorization;
+	private Authorization authorization;
 	private final HashMap<String, String> mHeaders;
 	private final ArrayList<Parameter> mParameters;
-	private final ArrayList<Parameter> mQueryParameters;
-	private final HashMap<String, FileHolder> mFileParameters;
-	private boolean mEnableGZipContent;
 
-	public SimpleRequest(final RequestBuilder builder) {
-		this.mOriginalUrl = builder.getUrl();
-		this.mMethod = builder.getMethod();
-		this.authorization = builder.getAuthorization();
+	public SimpleRequest(String url, HttpMethod method) {
+		this.mOriginalUrl = url;
+		this.mMethod = method == null ? HttpMethod.GET : method;
 		this.mHeaders = new HashMap<String, String>();
 		this.mParameters = new ArrayList<Parameter>();
-		this.mQueryParameters = new ArrayList<Parameter>();
-		this.mFileParameters = new HashMap<String, SimpleRequest.FileHolder>();
-
-		if (builder.getParameters() != null) {
-			mParameters.addAll(builder.getParameters());
-		}
-		if (builder.getQueryParameters() != null) {
-			mQueryParameters.addAll(builder.getQueryParameters());
-		}
-		if (builder.getFileParameters() != null) {
-			mFileParameters.putAll(builder.getFileParameters());
-		}
-		this.mEnableGZipContent = builder.isEnableGZipContent();
 		this.mUrl = SimpleHelper.extractUrlQueryParameters(mOriginalUrl,
-				mQueryParameters);
-	}
-
-	public boolean isEnableGZipContent() {
-		return this.mEnableGZipContent;
-	}
-
-	public void setEnableGZipContent(boolean enableGZipContent) {
-		this.mEnableGZipContent = enableGZipContent;
-	}
-
-	public void disableGzip() {
-		this.mEnableGZipContent = false;
+				mParameters);
 	}
 
 	public String getUrl() {
@@ -85,7 +53,15 @@ public class SimpleRequest {
 	}
 
 	public String getMethodName() {
-		return getMethodName(mMethod);
+		if (mMethod != null) {
+			return mMethod.name();
+		} else {
+			return null;
+		}
+	}
+
+	public void setAuthorization(Authorization authorization) {
+		this.authorization = authorization;
 	}
 
 	public Authorization getAuthorization() {
@@ -124,21 +100,15 @@ public class SimpleRequest {
 		}
 	}
 
-	public void addQueryParameter(String name, String value) {
+	public void addParameter(String name, File file) {
 		if (StringUtils.isNotEmpty(name)) {
-			mQueryParameters.add(new Parameter(name, value));
+			mParameters.add(new Parameter(name, file));
 		}
 	}
 
 	public void addParameters(Collection<? extends Parameter> params) {
 		if (params != null) {
 			this.mParameters.addAll(params);
-		}
-	}
-
-	public void addQueryParameters(Collection<? extends Parameter> params) {
-		if (params != null) {
-			this.mQueryParameters.addAll(params);
 		}
 	}
 
@@ -151,80 +121,36 @@ public class SimpleRequest {
 		}
 	}
 
-	public void addQueryParameters(Map<String, String> params) {
-		if (params != null) {
-			for (Map.Entry<String, String> entry : params.entrySet()) {
-				Parameter p = new Parameter(entry.getKey(), entry.getValue());
-				this.mQueryParameters.add(p);
-			}
-		}
-	}
-
-	public void addFileParameter(String key, File file)
-			throws FileNotFoundException {
-		addFileParameter(key, new FileInputStream(file), file.getName());
-	}
-
-	public void addFileParameter(String key, byte[] bytes) {
-		addFileParameter(key, new ByteArrayInputStream(bytes));
-	}
-
-	public void addFileParameter(String name, InputStream stream) {
-		addFileParameter(name, stream, null);
-	}
-
-	public void addFileParameter(String key, InputStream stream, String fileName) {
-		addFileParameter(key, stream, fileName);
-	}
-
-	public void addFileParameter(String key, InputStream stream,
-			String fileName, String contentType) {
-		if (StringUtils.isNotEmpty(key) && stream != null) {
-			mFileParameters.put(key, new FileHolder(stream, fileName,
-					contentType));
-		}
-	}
-
-	public List<Parameter> getParameters() {
+	public List<Parameter> getAllParameters() {
 		return this.mParameters;
 	}
 
-	public List<Parameter> getQueryParameters() {
-		return this.mQueryParameters;
+	public void removeAllParameters() {
+		mParameters.clear();
 	}
 
-	public HashMap<String, FileHolder> getFileParameters() {
-		return mFileParameters;
+	public List<Parameter> getTextParameters() {
+		List<Parameter> fileParameters = new ArrayList<Parameter>();
+		for (Parameter param : mParameters) {
+			if (!param.hasFile()) {
+				fileParameters.add(param);
+			}
+		}
+		return fileParameters;
 	}
 
-	public boolean hasParameters() {
-		return mParameters.size() > 0;
-	}
-
-	public boolean hasQueryParameters() {
-		return mQueryParameters.size() > 0;
+	public List<Parameter> getFileParameters() {
+		List<Parameter> fileParameters = new ArrayList<Parameter>();
+		for (Parameter param : mParameters) {
+			if (param.hasFile()) {
+				fileParameters.add(param);
+			}
+		}
+		return fileParameters;
 	}
 
 	public boolean hasFileParameters() {
-		return mFileParameters.size() > 0;
-	}
-
-	// public boolean hasOAuthParameters() {
-	// return mOAuthParameters.size() > 0;
-	// }
-
-	public void removeAllParameters() {
-		mParameters.clear();
-		mQueryParameters.clear();
-		mFileParameters.clear();
-	}
-
-	public static String getMethodName(final HttpMethod method) {
-		if (method != null) {
-			return method.name();
-		} else {
-			return null;
-		}
+		return parametersContainsFile(mParameters);
 	}
 
 	@Override
@@ -242,39 +168,22 @@ public class SimpleRequest {
 		builder.append(mHeaders);
 		builder.append(", mParameters=");
 		builder.append(mParameters);
-		builder.append(", mQueryParameters=");
-		builder.append(mQueryParameters);
-		builder.append(", mFileParameters=");
-		builder.append(mFileParameters);
 		builder.append("]");
 		return builder.toString();
 	}
 
-	static class FileHolder {
-		private static final String DEFAULT_FILENAME = "filename";
-		public final InputStream inputStream;
-		public final String fileName;
-		public final String contentType;
-
-		public FileHolder(InputStream inputStream, String fileName,
-				String contentType) {
-			this.inputStream = inputStream;
-			this.fileName = (fileName == null) ? DEFAULT_FILENAME : fileName;
-			this.contentType = contentType;
+	public static boolean parametersContainsFile(final List<Parameter> params) {
+		if (CollectionUtils.isEmpty(params)) {
+			return false;
 		}
-
-		@Override
-		public String toString() {
-			StringBuilder builder = new StringBuilder();
-			builder.append("FileHolder [inputStream=");
-			builder.append(inputStream);
-			builder.append(", fileName=");
-			builder.append(fileName);
-			builder.append(", contentType=");
-			builder.append(contentType);
-			builder.append("]");
-			return builder.toString();
+		boolean containsFile = false;
+		for (final Parameter param : params) {
+			if (param.hasFile()) {
+				containsFile = true;
+				break;
+			}
 		}
+		return containsFile;
 	}
 
 }

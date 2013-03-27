@@ -79,8 +79,7 @@ public final class AuthService {
 
 	private static void addOAuth2ToQueryParamters(final SimpleRequest request) {
 		String accessToken = request.getAuthorization().getToken();
-		request.addQueryParameter(AuthConstants.OAUTH2_ACCESS_TOKEN,
-				accessToken);
+		request.addParameter(AuthConstants.OAUTH2_ACCESS_TOKEN, accessToken);
 	}
 
 	private static void addOAuthToHeaders(final SimpleRequest request) {
@@ -118,7 +117,7 @@ public final class AuthService {
 
 	private static void appendAuthorizationToQueryParameters(
 			final SimpleRequest request, final List<Parameter> oauthParameters) {
-		request.addQueryParameters(oauthParameters);
+		request.addParameters(oauthParameters);
 	}
 
 	private static void appendAuthorizationToHeaders(
@@ -188,8 +187,7 @@ public final class AuthService {
 		final String method = request.getMethodName();
 		String encodedMethod = percentEncode(method);
 		List<Parameter> allParameters = new ArrayList<Parameter>();
-		allParameters.addAll(request.getParameters());
-		allParameters.addAll(request.getQueryParameters());
+		allParameters.addAll(request.getTextParameters());
 		allParameters.addAll(oauthParameters);
 		final String encodedParameters = getSortedAndEncodedParametersAsString(allParameters);
 		sb.append(encodedUrl).append("&").append(encodedMethod).append("&")
@@ -207,7 +205,7 @@ public final class AuthService {
 		Collections.sort(queryParameters);
 		StringBuilder sb = new StringBuilder();
 		for (Parameter pair : queryParameters) {
-			sb.append(PARAMETER_SEPARATOR).append(pair.getEncoded());
+			sb.append(PARAMETER_SEPARATOR).append(pair.getEncodedString());
 		}
 		return sb.substring(1).toString();
 	}

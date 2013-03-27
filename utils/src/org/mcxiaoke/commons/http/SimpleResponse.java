@@ -5,6 +5,8 @@ package org.mcxiaoke.commons.http;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.util.Arrays;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -137,6 +139,35 @@ public class SimpleResponse {
 			}
 		}
 		return wrappedEntity;
+	}
+
+	@Override
+	public String toString() {
+		final int maxLen = 10;
+		String content = null;
+		try {
+			content = getAsString();
+		} catch (IOException e) {
+			content = "" + e;
+		}
+		StringBuilder builder = new StringBuilder();
+		builder.append("SimpleResponse [statusLine=");
+		builder.append(statusLine);
+		builder.append(", statusCode=");
+		builder.append(statusCode);
+		builder.append(", statusMessage=");
+		builder.append(statusMessage);
+		builder.append(", headers=");
+		builder.append(headers != null ? Arrays.asList(headers).subList(0,
+				Math.min(headers.length, maxLen)) : null);
+		builder.append(", response=");
+		builder.append(content);
+		builder.append(", empty=");
+		builder.append(empty);
+		builder.append(", exception=");
+		builder.append(exception);
+		builder.append("]");
+		return builder.toString();
 	}
 
 }
