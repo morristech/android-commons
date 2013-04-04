@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <item name="empty_view" type="id"/>
+    <item name="empty_text" type="id"/>
+    <item name="empty_progress" type="id"/>
+    <item name="empty_progress_text" type="id"/>
+    <item name="empty_progress_bar"  type="id"/>
+
+</resources>
